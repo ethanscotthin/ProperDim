@@ -632,14 +632,9 @@ namespace ProperDim
 				: ConfigManager.Settings.LastOpacity;
 
 			int currentPercent = (int)Math.Round(baseValue * 100.0);
-			int remainder = currentPercent % 5;
-			int snappedPercent = (remainder > 2)
-				? currentPercent + (5 - remainder)
-				: currentPercent - remainder;
-
-			int targetPercent = snappedPercent;
-			if (id == HOTKEY_ID_UP) targetPercent += 5;
-			else if (id == HOTKEY_ID_DOWN) targetPercent -= 5;
+			int targetPercent = currentPercent;
+			if (id == HOTKEY_ID_UP) targetPercent += Math.Clamp(ConfigManager.Settings.IncreaseHotkeyStep, 1, 100);
+			else if (id == HOTKEY_ID_DOWN) targetPercent -= Math.Clamp(ConfigManager.Settings.DecreaseHotkeyStep, 1, 100);
 
 			// Logical brightness goes down to 1% (0.01), ApplyBrightness handles the hardware floor scaling
 			if (targetPercent > 100) targetPercent = 100;

@@ -85,8 +85,12 @@ public partial class ControlPanel : Window
 		TrayCheckBox.IsChecked = ConfigManager.Settings.CloseToTray;
 		SwapTrayClicksCheckBox.IsChecked = ConfigManager.Settings.SwapTrayIconClicks;
 		EnableHotkeysCheckBox.IsChecked = ConfigManager.Settings.HotkeysEnabled;
-		IncreaseHotkeyText.Text = ConfigManager.Settings.IncreaseHotkey;
-		DecreaseHotkeyText.Text = ConfigManager.Settings.DecreaseHotkey;
+		IncreaseHotkeyText.Text = FormatHotkey(ConfigManager.Settings.IncreaseHotkey);
+		DecreaseHotkeyText.Text = FormatHotkey(ConfigManager.Settings.DecreaseHotkey);
+		IncreaseHotkeyStep.ItemsSource = Enumerable.Range(1, 100);
+		DecreaseHotkeyStep.ItemsSource = Enumerable.Range(1, 100);
+		IncreaseHotkeyStep.SelectedItem = Math.Clamp(ConfigManager.Settings.IncreaseHotkeyStep, 1, 100);
+		DecreaseHotkeyStep.SelectedItem = Math.Clamp(ConfigManager.Settings.DecreaseHotkeyStep, 1, 100);
 
 		ScheduleCheckbox.IsChecked = ConfigManager.Settings.ScheduleToggle;
 		ToggleScheduleUI(ConfigManager.Settings.ScheduleToggle);
@@ -794,7 +798,7 @@ public partial class ControlPanel : Window
 			keys.Add(key.ToString());
 		}
 
-		string hotkeyString = string.Join(" + ", keys);
+		string hotkeyString = FormatHotkey(string.Join(" + ", keys));
 
 		if (!string.IsNullOrEmpty(hotkeyString))
 		{
@@ -810,6 +814,25 @@ public partial class ControlPanel : Window
 		}
 	}
 
+	private static string FormatHotkey(string hotkey)
+	{
+		return string.Join(" + ", hotkey.Split(" + ").Select(part =>
+			part.Equals("Next", StringComparison.OrdinalIgnoreCase) ? "PageDown" :
+			part.Equals("Prior", StringComparison.OrdinalIgnoreCase) ? "PageUp" : part));
+	}
+
+	private void HotkeyStep_SelectionChanged(object sender, SelectionChangedEventArgs e)
+	{
+		if (_isInitializing || sender is not ComboBox comboBox || comboBox.SelectedItem is not int step) return;
+
+		if (comboBox == IncreaseHotkeyStep)
+			ConfigManager.Settings.IncreaseHotkeyStep = step;
+		else if (comboBox == DecreaseHotkeyStep)
+			ConfigManager.Settings.DecreaseHotkeyStep = step;
+
+		ConfigManager.Settings.Save();
+	}
+
 	private void EnableHotkeysCheckBox_Changed(object sender, RoutedEventArgs e)
 	{
 		if (_isInitializing) return;
@@ -821,22 +844,17 @@ public partial class ControlPanel : Window
 
 	private void HotkeysTab_MouseDown(object sender, MouseButtonEventArgs e)
 	{
-		// 1. Check if the click target is actually the TextBox
-		if (IsClickOnTextBox(e.OriginalSource as DependencyObject))
+		if (IsClickOnHotkeyInput(e.OriginalSource as DependencyObject))
 			return;
 
-		// 2. Force focus to the background Grid (sender).
-		// Since we set Focusable="True" in XAML, this will succeed, 
-		// stealing focus from the TextBox and removing the blue border.
 		(sender as UIElement)?.Focus();
 	}
 
-	private static bool IsClickOnTextBox(DependencyObject clickedObj)
+	private static bool IsClickOnHotkeyInput(DependencyObject clickedObj)
 	{
-		// Walk up the visual tree to see if the clicked element belongs to a TextBox
 		while (clickedObj != null)
 		{
-			if (clickedObj is TextBox) return true;
+			if (clickedObj is TextBox || clickedObj is ComboBox) return true;
 			clickedObj = System.Windows.Media.VisualTreeHelper.GetParent(clickedObj);
 		}
 		return false;

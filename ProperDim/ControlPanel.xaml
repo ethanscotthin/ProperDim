@@ -513,7 +513,7 @@
 											<CheckBox Name="EnableHotkeysCheckBox" Content="Enable Hotkeys" Margin="2,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" HorizontalAlignment="Left" Checked="EnableHotkeysCheckBox_Changed" Unchecked="EnableHotkeysCheckBox_Changed" />
 										</Grid>
 										<Grid Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-											<StackPanel Width="280" Margin="0,0,32,0">
+												<StackPanel Width="280">
 												<StackPanel IsEnabled="{Binding ElementName=EnableHotkeysCheckBox, Path=IsChecked}">
 													<FrameworkElement.Style>
 											<Style TargetType="{x:Type StackPanel}">
@@ -528,17 +528,25 @@
 											<Grid.ColumnDefinitions>
 												<ColumnDefinition Width="*" />
 												<ColumnDefinition Width="Auto" />
+												<ColumnDefinition Width="Auto" />
+												<ColumnDefinition Width="Auto" />
 											</Grid.ColumnDefinitions>
-											<TextBlock Text="Increase Brightness:" Foreground="#FFFFFFFF" VerticalAlignment="Center" Margin="0,0,10,0" HorizontalAlignment="Right" />
+										<TextBlock Text="Increase:" Foreground="#FFFFFFFF" VerticalAlignment="Center" Margin="0,0,6,0" HorizontalAlignment="Right" />
 											<TextBox Name="IncreaseHotkeyText" Grid.Column="1" Style="{StaticResource HotkeyTextBoxStyle}" IsReadOnly="True" PreviewKeyDown="HotkeyTextBox_PreviewKeyDown" />
+										<ComboBox Name="IncreaseHotkeyStep" Grid.Column="2" Width="56" Margin="6,0,0,0" ToolTip="Brightness increase step" SelectionChanged="HotkeyStep_SelectionChanged" />
+										<TextBlock Grid.Column="3" Text="%" Foreground="White" VerticalAlignment="Center" Margin="3,0,0,0" />
 										</Grid>
 										<Grid Margin="0,8,0,12">
 											<Grid.ColumnDefinitions>
 												<ColumnDefinition Width="*" />
 												<ColumnDefinition Width="Auto" />
+												<ColumnDefinition Width="Auto" />
+												<ColumnDefinition Width="Auto" />
 											</Grid.ColumnDefinitions>
-											<TextBlock Text="Decrease Brightness:" Foreground="#FFFFFFFF" VerticalAlignment="Center" Margin="0,0,10,0" HorizontalAlignment="Right" />
+										<TextBlock Text="Decrease:" Foreground="#FFFFFFFF" VerticalAlignment="Center" Margin="0,0,6,0" HorizontalAlignment="Right" />
 											<TextBox Name="DecreaseHotkeyText" Grid.Column="1" Style="{StaticResource HotkeyTextBoxStyle}" IsReadOnly="True" PreviewKeyDown="HotkeyTextBox_PreviewKeyDown" />
+										<ComboBox Name="DecreaseHotkeyStep" Grid.Column="2" Width="56" Margin="6,0,0,0" ToolTip="Brightness decrease step" SelectionChanged="HotkeyStep_SelectionChanged" />
+										<TextBlock Grid.Column="3" Text="%" Foreground="White" VerticalAlignment="Center" Margin="3,0,0,0" />
 										</Grid>
 										<TextBlock Text="Click a field, then press desired keys" Foreground="#FF909090" FontSize="11" FontStyle="Italic" FontWeight="SemiBold" TextAlignment="Center" Margin="22,0,0,8" />
 									</StackPanel>

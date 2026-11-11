@@ -29,6 +29,8 @@ public class AppSettings
 	public bool HotkeysEnabled { get; set; } = false;
 	public string IncreaseHotkey { get; set; } = "";
 	public string DecreaseHotkey { get; set; } = "";
+	public int IncreaseHotkeyStep { get; set; } = 10;
+	public int DecreaseHotkeyStep { get; set; } = 10;
 	public bool ScheduleToggle { get; set; } = false;
 	public double ControlPanelLeft { get; set; } = -1;
 	public double ControlPanelTop { get; set; } = -1;
@@ -42,6 +44,7 @@ public class AppSettings
 	public double WarningMessageHeight { get; set; } = 150;
 	public double MinBrightnessDialogWidth { get; set; } = 300;
 	public double MinBrightnessDialogHeight { get; set; } = 260;
+	public int BrightnessScaleVersion { get; set; } = 0;
 	public double LastOpacity { get; set; } = 1.0;
 	public List<DimSchedule> SavedSchedules { get; set; } = [];
 	public bool UseMilitaryTime { get; set; } = false;
@@ -110,6 +113,17 @@ public static class ConfigManager
 		catch
 		{
 			Settings = new AppSettings();
+		}
+
+		if (Settings.BrightnessScaleVersion == 0)
+		{
+			Settings.LastOpacity = MainWindow.HardwareToLogicalBrightness(Settings.LastOpacity);
+			foreach (DimSchedule schedule in Settings.SavedSchedules ?? [])
+			{
+				if (schedule != null)
+					schedule.Brightness = MainWindow.HardwareToLogicalBrightness(schedule.Brightness);
+			}
+			Settings.BrightnessScaleVersion = 1;
 		}
 	}
 
