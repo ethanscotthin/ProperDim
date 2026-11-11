@@ -102,6 +102,10 @@ This tab allows you to change your default hotkeys settings, which
 are [ctrl + alt + up] to increase the brightness, and 
 [ctrl + alt + down] to decrease the brightness. You can also 
 completely disable the hotkeys here by unchecking the checkbox.
+Each hotkey adjustment shows a small overlay on the right side of
+the primary screen with the direction, current brightness percentage,
+and a brightness bar. It will not take focus or block mouse clicks,
+and disappears 1.5 seconds after the last hotkey adjustment.
 
 __| Options |_____________________________________________________
 This tab contains application settings and management buttons. 

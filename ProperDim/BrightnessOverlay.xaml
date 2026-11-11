@@ -1,0 +1,35 @@
+<Window x:Class="ProperDim.BrightnessOverlay"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		Title="Brightness" Width="220" Height="106"
+		WindowStyle="None" ResizeMode="NoResize"
+		AllowsTransparency="True" Background="Transparent"
+		ShowInTaskbar="False" ShowActivated="False" Topmost="True"
+		Focusable="False" IsHitTestVisible="False"
+		WindowStartupLocation="Manual">
+	<Border Background="#EE2D2D2D" BorderBrush="#555555"
+			BorderThickness="1" CornerRadius="8" Padding="16">
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="6"/>
+			</Grid.RowDefinitions>
+			<TextBlock x:Name="DirectionText" Foreground="#CCCCCC" FontSize="12"/>
+			<TextBlock x:Name="PercentageText" Grid.Row="1" Foreground="White"
+					   FontSize="26" FontWeight="SemiBold" VerticalAlignment="Center"/>
+			<ProgressBar x:Name="BrightnessBar" Grid.Row="2" Minimum="0" Maximum="1"
+						 Foreground="#B8B8B8" Background="#555555">
+				<ProgressBar.Template>
+					<ControlTemplate TargetType="ProgressBar">
+						<Grid x:Name="PART_Track">
+							<Border Background="{TemplateBinding Background}" CornerRadius="3"/>
+							<Border x:Name="PART_Indicator" Background="{TemplateBinding Foreground}"
+									CornerRadius="3" HorizontalAlignment="Left"/>
+						</Grid>
+					</ControlTemplate>
+				</ProgressBar.Template>
+			</ProgressBar>
+		</Grid>
+	</Border>
+</Window>

@@ -55,6 +55,7 @@ namespace ProperDim
 		private readonly GlobalHotkeyService _hotkeyService;
 		private readonly HardwareGammaService _gammaService;
 		private DateTime _lastHotkeyTime = DateTime.MinValue;
+		private BrightnessOverlay _brightnessOverlay;
 
 		// OPTIMIZATION: Static keyword list to avoid reallocation
 		private static readonly string[] _virtualKeywords = [
@@ -338,6 +339,10 @@ namespace ProperDim
 			_lastAppliedHardwareBrightness = targetHardwareBrightness;
 
 			GlobalBrightnessChanged?.Invoke(_currentGlobalBrightness);
+			if (_brightnessOverlay?.IsVisible == true)
+			{
+				_brightnessOverlay.UpdateBrightness(_currentGlobalBrightness);
+			}
 
 			if (!_isUpdatingFromAnimator && TrayIcon is { } trayIcon && _currentTrayMenu?.IsVisible != true)
 			{
@@ -622,6 +627,7 @@ namespace ProperDim
 		private void OnHotkeyPressed(int id)
 		{
 			if (!ConfigManager.Settings.HotkeysEnabled) return;
+			if (id != HOTKEY_ID_UP && id != HOTKEY_ID_DOWN) return;
 
 			// Prevent Windows key auto-repeat from moving the brightness too rapidly
 			if ((DateTime.Now - _lastHotkeyTime).TotalMilliseconds < 75) return;
@@ -647,6 +653,8 @@ namespace ProperDim
 			_saveDebouncer.Stop();
 			_saveDebouncer.Start();
 
+			_brightnessOverlay ??= new BrightnessOverlay();
+			_brightnessOverlay.ShowBrightness(_currentGlobalBrightness, id == HOTKEY_ID_UP);
 			// Use a fixed duration that blends smoothly if the key is held
 			ApplyBrightness(finalTarget, animate: true, linear: true, durationMs: 150);
 		}
@@ -851,6 +859,7 @@ namespace ProperDim
 
 		protected override void OnClosed(EventArgs e)
 		{
+			_brightnessOverlay?.Close();
 			SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
 			SystemEvents.SessionSwitch -= SystemEvents_SessionSwitch;
 			SystemEvents.PowerModeChanged -= SystemEvents_PowerModeChanged;
@@ -1067,6 +1076,7 @@ namespace ProperDim
 		public void ShutdownApp()
 		{
 			_isShuttingDown = true;
+			_brightnessOverlay?.Close();
 			if (_currentTrayMenu != null)
 			{
 				try { _currentTrayMenu.Close(); } catch { }
