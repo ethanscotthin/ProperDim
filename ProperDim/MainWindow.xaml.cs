@@ -798,7 +798,7 @@ namespace ProperDim
 			}
 			else
 			{
-				// Nothing was missed, just restore whatever the opacity was before sleep
+				// Nothing was missed, just re-apply the current in-session brightness
 				ApplyBrightness(ConfigManager.Settings.LastOpacity, animate: animate, durationMs: durationMs);
 			}
 		}

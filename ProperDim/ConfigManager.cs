@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ProperDim;
 
@@ -44,6 +45,8 @@ public class AppSettings
 	public double WarningMessageHeight { get; set; } = 150;
 	public double MinBrightnessDialogWidth { get; set; } = 300;
 	public double MinBrightnessDialogHeight { get; set; } = 260;
+	// Runtime-only: not persisted so the app always starts at 100% instead of restoring the previous session's brightness.
+	[JsonIgnore]
 	public double LastOpacity { get; set; } = 1.0;
 	public List<DimSchedule> SavedSchedules { get; set; } = [];
 	public bool UseMilitaryTime { get; set; } = false;

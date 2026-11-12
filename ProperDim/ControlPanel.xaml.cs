@@ -898,7 +898,7 @@ public partial class ControlPanel : Window
 			this.Height = (contentWidth / (350.0 / 200.0)) + marginOffset;
 		}
 
-		// --- Restore last dimmer brightness ---
+		// --- Sync slider with current dimmer brightness ---
 		DimmerSlider.Value = ConfigManager.Settings.LastOpacity;
 
 		// --- Sync checkboxes and hotkeys ---
