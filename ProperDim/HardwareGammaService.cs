@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -31,7 +32,7 @@ public class HardwareGammaService : IDisposable
 	private readonly ConcurrentDictionary<string, double> _targetGammas = new();
 	private readonly ConcurrentDictionary<string, double> _appliedGammas = new();
 	private readonly Lock _rampLock = new();
-	private double _currentMagFactor = 1.0;
+	private double _currentGlobalBrightness = 1.0;
 
 	private RAMP _sharedRamp = new()
 	{
@@ -86,6 +87,21 @@ public class HardwareGammaService : IDisposable
 
 	public void SetGlobalMagnification(double globalBrightness)
 	{
+		if (Math.Abs(_currentGlobalBrightness - globalBrightness) < 0.0001) return;
+
+		var effect = CreateGlobalColorEffect(globalBrightness);
+		if (NativeMethods.MagSetFullscreenColorEffect(ref effect))
+		{
+			_currentGlobalBrightness = globalBrightness;
+		}
+		else
+		{
+			Debug.WriteLine($"Unable to apply the global brightness and saturation effect at brightness {globalBrightness}.");
+		}
+	}
+
+	internal static MAGCOLOREFFECT CreateGlobalColorEffect(double globalBrightness)
+	{
 		double visualFactor = 1.0;
 
 		if (globalBrightness < 0.5)
@@ -107,21 +123,23 @@ public class HardwareGammaService : IDisposable
 			visualFactor = Math.Pow(linearFactor, 2.2);
 		}
 
-		if (Math.Abs(_currentMagFactor - visualFactor) < 0.001) return;
-		_currentMagFactor = visualFactor;
-
 		float f = (float)visualFactor;
-		var effect = new MAGCOLOREFFECT
+		float desaturation = (float)(0.65 * (1.0 - Math.Clamp(globalBrightness, 0.0, 1.0)));
+		float saturation = 1.0f - desaturation;
+		// Blend toward luminance using the Magnification API's row-vector matrix layout.
+		float red = 0.2126f * desaturation;
+		float green = 0.7152f * desaturation;
+		float blue = 0.0722f * desaturation;
+		return new MAGCOLOREFFECT
 		{
 			transform = [
-				f, 0, 0, 0, 0,
-				0, f, 0, 0, 0,
-				0, 0, f, 0, 0,
+				f * (saturation + red), f * red, f * red, 0, 0,
+				f * green, f * (saturation + green), f * green, 0, 0,
+				f * blue, f * blue, f * (saturation + blue), 0, 0,
 				0, 0, 0, 1, 0,
 				0, 0, 0, 0, 1
 			]
 		};
-		NativeMethods.MagSetFullscreenColorEffect(ref effect);
 	}
 
 	private void WatchdogTick(object state)

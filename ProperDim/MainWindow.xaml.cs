@@ -362,7 +362,7 @@ namespace ProperDim
 				_gammaService.SetTargetGamma(m.DeviceName, targetHardwareBrightness);
 			}
 
-			// Delegate dimming below 50% to the global Magnification API
+			// Apply subtle desaturation globally, with additional dimming below 50%.
 			_gammaService.SetGlobalMagnification(targetHardwareBrightness);
 		}
 
